@@ -31,6 +31,24 @@ END;;
 
 DELIMITER ;
 
+DROP TABLE IF EXISTS `role`;
+CREATE TABLE `role` (
+  `id` varchar(255) COLLATE utf8_bin NOT NULL,
+  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `roles_desc_uindex` (`desc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
+DROP TABLE IF EXISTS `entity`;
+CREATE TABLE `entity` (
+  `id` varchar(255) COLLATE utf8_bin NOT NULL,
+  `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -59,18 +77,6 @@ CREATE TABLE `application` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-DROP TABLE IF EXISTS `applicationattribute`;
-CREATE TABLE `applicationattribute` (
-  `application` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `attribute` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `value` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`application`,`attribute`),
-  KEY `applicationattribute_attribute_fk` (`attribute`),
-  CONSTRAINT `applicationattribute_application_fk` FOREIGN KEY (`application`) REFERENCES `application` (`id`),
-  CONSTRAINT `applicationattribute_attribute_fk` FOREIGN KEY (`attribute`) REFERENCES `attribute` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
 DROP TABLE IF EXISTS `attribute`;
 CREATE TABLE `attribute` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -80,12 +86,15 @@ CREATE TABLE `attribute` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-DROP TABLE IF EXISTS `entity`;
-CREATE TABLE `entity` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `applicationattribute`;
+CREATE TABLE `applicationattribute` (
+  `application` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `attribute` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `value` varchar(255) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`application`,`attribute`),
+  KEY `applicationattribute_attribute_fk` (`attribute`),
+  CONSTRAINT `applicationattribute_application_fk` FOREIGN KEY (`application`) REFERENCES `application` (`id`),
+  CONSTRAINT `applicationattribute_attribute_fk` FOREIGN KEY (`attribute`) REFERENCES `attribute` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
@@ -178,15 +187,6 @@ CREATE TABLE `projectrevlogdoc` (
   PRIMARY KEY (`id`),
   KEY `projectrevlogdoc_prjrevlog_fk` (`projectrevlog`),
   CONSTRAINT `projectrevlogdoc_prjrevlog_fk` FOREIGN KEY (`projectrevlog`) REFERENCES `projectrevlog` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
-DROP TABLE IF EXISTS `role`;
-CREATE TABLE `role` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `roles_desc_uindex` (`desc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
