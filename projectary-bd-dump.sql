@@ -5,6 +5,26 @@ SET foreign_key_checks = 0;
 SET time_zone = 'SYSTEM';
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
+
+DROP TABLE IF EXISTS `entity`;
+CREATE TABLE `entity` (
+  `id` varchar(255) COLLATE utf8_bin NOT NULL,
+  `fname` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `lname` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
+DROP TABLE IF EXISTS `role`;
+CREATE TABLE `role` (
+  `id` varchar(255) COLLATE utf8_bin NOT NULL,
+  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `roles_desc_uindex` (`desc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -33,6 +53,15 @@ CREATE TABLE `application` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
+DROP TABLE IF EXISTS `attribute`;
+CREATE TABLE `attribute` (
+  `id` varchar(255) COLLATE utf8_bin NOT NULL,
+  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
+  `datatype` varchar(30) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 DROP TABLE IF EXISTS `applicationattribute`;
 CREATE TABLE `applicationattribute` (
   `application` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
@@ -44,24 +73,6 @@ CREATE TABLE `applicationattribute` (
   CONSTRAINT `applicationattribute_attribute_fk` FOREIGN KEY (`attribute`) REFERENCES `attribute` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-
-DROP TABLE IF EXISTS `attribute`;
-CREATE TABLE `attribute` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  `datatype` varchar(30) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
-DROP TABLE IF EXISTS `entity`;
-CREATE TABLE `entity` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `fname` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `lname` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 DROP TABLE IF EXISTS `function`;
 CREATE TABLE `function` (
@@ -167,15 +178,6 @@ CREATE TABLE `projectweb` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-DROP TABLE IF EXISTS `role`;
-CREATE TABLE `role` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `roles_desc_uindex` (`desc`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
 DROP TABLE IF EXISTS `rolepermission`;
 CREATE TABLE `rolepermission` (
   `role` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -244,4 +246,4 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
--- 2017-03-14 16:32:20
+-- 2017-03-22 15:56:00
