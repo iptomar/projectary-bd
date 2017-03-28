@@ -958,11 +958,12 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertNewUser`(IN username VARCHAR(255), IN password VARCHAR(255),IN email VARCHAR(255), IN type INT, IN extid VARCHAR(255))
 BEGIN
  DECLARE UUID VARCHAR(255);
+ DECLARE EID VARCHAR(255);
 CASE
-WHEN type=1 THEN SELECT UUID() INTO UUID;CALL InsertNewEntity(UUID,type,extid);INSERT INTO student VALUES(UUID,extid);
-WHEN type=2 THEN SELECT UUID() INTO UUID;CALL InsertNewEntity(UUID,type,extid);INSERT INTO teacher VALUES(UUID,extid);
+WHEN type=1 THEN SELECT UUID() INTO UUID;CALL InsertNewEntity(UUID,type,extid);SELECT id INTO EID FROM entity WHERE name = UUID LIMIT 1;
+WHEN type=2 THEN SELECT UUID() INTO UUID;CALL InsertNewEntity(UUID,type,extid);SELECT id INTO EID FROM entity WHERE name = UUID LIMIT 1;
 END CASE;
-    INSERT INTO users VALUES(UUID,username,password,NOW(),0,1,UUID,email);
+    INSERT INTO users VALUES(UUID,username,password,email, NOW(),0,1,EID);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
