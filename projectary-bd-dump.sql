@@ -1,6 +1,6 @@
 -- MySQL dump 10.16  Distrib 10.1.22-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: projectary
+-- Host: localhost    Database: projectary-master
 -- ------------------------------------------------------
 -- Server version	10.1.22-MariaDB-1~xenial
 
@@ -16,41 +16,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `projectary`
+-- Current Database: `projectary-master`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `projectary` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `projectary-master` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
 
-USE `projectary`;
-
---
--- Table structure for table `admin`
---
-
-DROP TABLE IF EXISTS `admin`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `admin` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `updatedin` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `deletedin` timestamp NULL DEFAULT NULL,
-  `createdby` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `admin_createdby_fk` (`createdby`),
-  CONSTRAINT `admin_createdby_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `admin_entity_fk` FOREIGN KEY (`id`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `admin`
---
-
-LOCK TABLES `admin` WRITE;
-/*!40000 ALTER TABLE `admin` DISABLE KEYS */;
-/*!40000 ALTER TABLE `admin` ENABLE KEYS */;
-UNLOCK TABLES;
+USE `projectary-master`;
 
 --
 -- Table structure for table `application`
@@ -60,12 +31,14 @@ DROP TABLE IF EXISTS `application`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `application` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `submitedby` varchar(255) COLLATE utf8_bin NOT NULL,
+  `gid` varchar(255) COLLATE utf8_bin NOT NULL,
+  `pid` varchar(255) COLLATE utf8_bin NOT NULL,
   `submitedin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `application_entity_fk` (`submitedby`),
-  CONSTRAINT `application_entity_fk` FOREIGN KEY (`submitedby`) REFERENCES `entity` (`id`)
+  `approvedin` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`gid`,`pid`),
+  KEY `application_project_fk` (`pid`),
+  CONSTRAINT `application_group_fk` FOREIGN KEY (`gid`) REFERENCES `group` (`id`),
+  CONSTRAINT `application_project_fk` FOREIGN KEY (`pid`) REFERENCES `project` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -79,67 +52,6 @@ LOCK TABLES `application` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `applicationattribute`
---
-
-DROP TABLE IF EXISTS `applicationattribute`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `applicationattribute` (
-  `application` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `attribute` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `value` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`application`,`attribute`),
-  KEY `applicationattribute_attribute_fk` (`attribute`),
-  KEY `applicationattribute_entity_fk` (`createdby`),
-  CONSTRAINT `applicationattribute_application_fk` FOREIGN KEY (`application`) REFERENCES `application` (`id`),
-  CONSTRAINT `applicationattribute_attribute_fk` FOREIGN KEY (`attribute`) REFERENCES `attribute` (`id`),
-  CONSTRAINT `applicationattribute_entity_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `applicationattribute`
---
-
-LOCK TABLES `applicationattribute` WRITE;
-/*!40000 ALTER TABLE `applicationattribute` DISABLE KEYS */;
-/*!40000 ALTER TABLE `applicationattribute` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `applicationgroup`
---
-
-DROP TABLE IF EXISTS `applicationgroup`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `applicationgroup` (
-  `application` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `group` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `createdin` timestamp NULL DEFAULT NULL,
-  `createdby` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  KEY `applicationgroup_application_fk` (`application`),
-  KEY `applicationgroup_group_fk` (`group`),
-  KEY `applicationgroup_approvedby_fk` (`createdby`),
-  CONSTRAINT `applicationgroup_application_fk` FOREIGN KEY (`application`) REFERENCES `application` (`id`),
-  CONSTRAINT `applicationgroup_approvedby_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `applicationgroup_group_fk` FOREIGN KEY (`group`) REFERENCES `groupentity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table Used to Associate a Group of Entities to an Application';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `applicationgroup`
---
-
-LOCK TABLES `applicationgroup` WRITE;
-/*!40000 ALTER TABLE `applicationgroup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `applicationgroup` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `attribute`
 --
 
@@ -148,10 +60,10 @@ DROP TABLE IF EXISTS `attribute`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `attribute` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  `datatype` varchar(30) COLLATE utf8_bin NOT NULL,
+  `desc` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Attributes Table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -173,12 +85,10 @@ DROP TABLE IF EXISTS `course`;
 CREATE TABLE `course` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  `school` varchar(255) COLLATE utf8_bin NOT NULL,
-  `numcurso` varchar(255) COLLATE utf8_bin NOT NULL,
+  `sid` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `course_numcurso_uindex` (`numcurso`),
-  KEY `course_school_fk` (`school`),
-  CONSTRAINT `course_school_fk` FOREIGN KEY (`school`) REFERENCES `school` (`id`)
+  KEY `course_school_fk` (`sid`),
+  CONSTRAINT `course_school_fk` FOREIGN KEY (`sid`) REFERENCES `school` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -192,196 +102,55 @@ LOCK TABLES `course` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `courseentity`
+-- Table structure for table `group`
 --
 
-DROP TABLE IF EXISTS `courseentity`;
+DROP TABLE IF EXISTS `group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `courseentity` (
-  `course` varchar(255) COLLATE utf8_bin NOT NULL,
-  `entity` varchar(255) COLLATE utf8_bin NOT NULL,
-  `enryear` year(4) NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`course`,`entity`,`enryear`),
-  KEY `courseentity_entity_fk` (`entity`),
-  CONSTRAINT `courseentity_course_fk` FOREIGN KEY (`course`) REFERENCES `course` (`id`),
-  CONSTRAINT `courseentity_entity_fk` FOREIGN KEY (`entity`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `courseentity`
---
-
-LOCK TABLES `courseentity` WRITE;
-/*!40000 ALTER TABLE `courseentity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `courseentity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `departament`
---
-
-DROP TABLE IF EXISTS `departament`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `departament` (
+CREATE TABLE `group` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  `school` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `departament_school_fk` (`school`),
-  CONSTRAINT `departament_school_fk` FOREIGN KEY (`school`) REFERENCES `school` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `departament`
---
-
-LOCK TABLES `departament` WRITE;
-/*!40000 ALTER TABLE `departament` DISABLE KEYS */;
-/*!40000 ALTER TABLE `departament` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `departamententity`
---
-
-DROP TABLE IF EXISTS `departamententity`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `departamententity` (
-  `departament` varchar(255) COLLATE utf8_bin NOT NULL,
-  `entity` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`entity`),
-  KEY `departamententity_dep_fk` (`departament`),
-  CONSTRAINT `departamententity_dep_fk` FOREIGN KEY (`departament`) REFERENCES `departament` (`id`),
-  CONSTRAINT `departamententity_entity_fk` FOREIGN KEY (`entity`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `departamententity`
---
-
-LOCK TABLES `departamententity` WRITE;
-/*!40000 ALTER TABLE `departamententity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `departamententity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `entity`
---
-
-DROP TABLE IF EXISTS `entity`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `entity` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `password` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `entity`
+-- Dumping data for table `group`
 --
 
-LOCK TABLES `entity` WRITE;
-/*!40000 ALTER TABLE `entity` DISABLE KEYS */;
-INSERT INTO `entity` VALUES ('26774d25-1857-11e7-a99b-525400f5614a','a','2017-04-03 10:20:24');
-/*!40000 ALTER TABLE `entity` ENABLE KEYS */;
+LOCK TABLES `group` WRITE;
+/*!40000 ALTER TABLE `group` DISABLE KEYS */;
+/*!40000 ALTER TABLE `group` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `entitycontact`
+-- Table structure for table `groupuser`
 --
 
-DROP TABLE IF EXISTS `entitycontact`;
+DROP TABLE IF EXISTS `groupuser`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `entitycontact` (
-  `entity` varchar(255) COLLATE utf8_bin NOT NULL,
-  `contact` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`entity`,`contact`),
-  CONSTRAINT `entitycontact_entity_fk` FOREIGN KEY (`entity`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `entitycontact`
---
-
-LOCK TABLES `entitycontact` WRITE;
-/*!40000 ALTER TABLE `entitycontact` DISABLE KEYS */;
-/*!40000 ALTER TABLE `entitycontact` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `function`
---
-
-DROP TABLE IF EXISTS `function`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `function` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `desc` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `function_entity_fk` (`createdby`),
-  CONSTRAINT `function_entity_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `function`
---
-
-LOCK TABLES `function` WRITE;
-/*!40000 ALTER TABLE `function` DISABLE KEYS */;
-/*!40000 ALTER TABLE `function` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `groupentity`
---
-
-DROP TABLE IF EXISTS `groupentity`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `groupentity` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `entity` varchar(255) COLLATE utf8_bin NOT NULL,
-  `function` varchar(255) COLLATE utf8_bin NOT NULL,
-  `grade` decimal(10,0) DEFAULT '0',
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  `approvedby` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+CREATE TABLE `groupuser` (
+  `gid` varchar(255) COLLATE utf8_bin NOT NULL,
+  `uid` varchar(255) COLLATE utf8_bin NOT NULL,
+  `grade` decimal(10,0) NOT NULL DEFAULT '0',
   `approvedin` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`,`entity`,`function`),
-  KEY `groupentity_entity_fk` (`entity`),
-  KEY `groupentity_approval_fk` (`approvedby`),
-  KEY `groupentity_createdby_fk` (`createdby`),
-  KEY `groupentity_function_fk` (`function`),
-  CONSTRAINT `groupentity_approval_fk` FOREIGN KEY (`approvedby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `groupentity_createdby_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `groupentity_entity_fk` FOREIGN KEY (`entity`) REFERENCES `entity` (`id`),
-  CONSTRAINT `groupentity_function_fk` FOREIGN KEY (`function`) REFERENCES `function` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table Used to Create Groups of Entities';
+  PRIMARY KEY (`gid`,`uid`),
+  KEY `groupuser_user_fk` (`uid`),
+  CONSTRAINT `groupuser_group_fk` FOREIGN KEY (`gid`) REFERENCES `group` (`id`),
+  CONSTRAINT `groupuser_user_fk` FOREIGN KEY (`uid`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `groupentity`
+-- Dumping data for table `groupuser`
 --
 
-LOCK TABLES `groupentity` WRITE;
-/*!40000 ALTER TABLE `groupentity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `groupentity` ENABLE KEYS */;
+LOCK TABLES `groupuser` WRITE;
+/*!40000 ALTER TABLE `groupuser` DISABLE KEYS */;
+/*!40000 ALTER TABLE `groupuser` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -393,16 +162,15 @@ DROP TABLE IF EXISTS `project`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `project` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `application` varchar(255) COLLATE utf8_bin NOT NULL,
-  `approvedby` varchar(255) COLLATE utf8_bin NOT NULL,
   `approvedin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `start` date DEFAULT NULL,
-  `end` date DEFAULT NULL,
+  `YEAR` year(4) NOT NULL,
+  `cid` varchar(255) COLLATE utf8_bin NOT NULL,
+  `ptbid` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `project_application_uindex` (`application`),
-  KEY `project_entity_fk` (`approvedby`),
-  CONSTRAINT `project_application_fk` FOREIGN KEY (`application`) REFERENCES `application` (`id`),
-  CONSTRAINT `project_entity_fk` FOREIGN KEY (`approvedby`) REFERENCES `entity` (`id`)
+  KEY `project_ptb_fk` (`ptbid`),
+  KEY `project_course_fk` (`cid`),
+  CONSTRAINT `project_course_fk` FOREIGN KEY (`cid`) REFERENCES `course` (`id`),
+  CONSTRAINT `project_ptb_fk` FOREIGN KEY (`ptbid`) REFERENCES `projtobe` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -416,188 +184,57 @@ LOCK TABLES `project` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `projectrev`
+-- Table structure for table `projectattribute`
 --
 
-DROP TABLE IF EXISTS `projectrev`;
+DROP TABLE IF EXISTS `projectattribute`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `projectrev` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `project` varchar(255) COLLATE utf8_bin NOT NULL,
-  `start` date NOT NULL,
-  `end` date NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `projectrev_proj_fk` (`project`),
-  KEY `projectrev_entity_fk` (`createdby`),
-  CONSTRAINT `projectrev_entity_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `projectrev_proj_fk` FOREIGN KEY (`project`) REFERENCES `project` (`id`)
+CREATE TABLE `projectattribute` (
+  `pid` varchar(255) COLLATE utf8_bin NOT NULL,
+  `aid` varchar(255) COLLATE utf8_bin NOT NULL,
+  `value` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`pid`,`aid`),
+  KEY `projectattributes_attributes_fk` (`aid`),
+  CONSTRAINT `projectattributes_attributes_fk` FOREIGN KEY (`aid`) REFERENCES `attribute` (`id`),
+  CONSTRAINT `projectattributes_project_fk` FOREIGN KEY (`pid`) REFERENCES `project` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `projectrev`
+-- Dumping data for table `projectattribute`
 --
 
-LOCK TABLES `projectrev` WRITE;
-/*!40000 ALTER TABLE `projectrev` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projectrev` ENABLE KEYS */;
+LOCK TABLES `projectattribute` WRITE;
+/*!40000 ALTER TABLE `projectattribute` DISABLE KEYS */;
+/*!40000 ALTER TABLE `projectattribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `projectrevgroup`
+-- Table structure for table `projtobe`
 --
 
-DROP TABLE IF EXISTS `projectrevgroup`;
+DROP TABLE IF EXISTS `projtobe`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `projectrevgroup` (
-  `projectrev` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  `approvedby` varchar(255) COLLATE utf8_bin NOT NULL,
-  `approvedin` timestamp NULL DEFAULT NULL,
-  `groupentity` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`projectrev`),
-  KEY `projectreventity_groupentity_fk` (`groupentity`),
-  KEY `projectreventity_approvedby_fk` (`approvedby`),
-  KEY `projectreventity_createdby_fk` (`createdby`),
-  CONSTRAINT `projectreventity_approvedby_fk` FOREIGN KEY (`approvedby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `projectreventity_createdby_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `projectreventity_groupentity_fk` FOREIGN KEY (`groupentity`) REFERENCES `groupentity` (`id`),
-  CONSTRAINT `projectreventity_projrev_fk` FOREIGN KEY (`projectrev`) REFERENCES `projectrev` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `projectrevgroup`
---
-
-LOCK TABLES `projectrevgroup` WRITE;
-/*!40000 ALTER TABLE `projectrevgroup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projectrevgroup` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `projectrevlog`
---
-
-DROP TABLE IF EXISTS `projectrevlog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `projectrevlog` (
+CREATE TABLE `projtobe` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `projectrev` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  `desc` longtext COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `projectlogs_projrev_fk` (`projectrev`),
-  KEY `projectlogs_entity_fk` (`createdby`),
-  CONSTRAINT `projectlogs_entity_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `projectlogs_projrev_fk` FOREIGN KEY (`projectrev`) REFERENCES `project` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table to Register Project Logs';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `projectrevlog`
---
-
-LOCK TABLES `projectrevlog` WRITE;
-/*!40000 ALTER TABLE `projectrevlog` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projectrevlog` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `projectrevlogdoc`
---
-
-DROP TABLE IF EXISTS `projectrevlogdoc`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `projectrevlogdoc` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `projectrevlog` varchar(255) COLLATE utf8_bin NOT NULL,
-  `url` longtext COLLATE utf8_bin,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `projectrevlogdoc_prjrevlog_fk` (`projectrevlog`),
-  KEY `projectrevlogdoc_entity_fk` (`createdby`),
-  CONSTRAINT `projectrevlogdoc_entity_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `projectrevlogdoc_prjrevlog_fk` FOREIGN KEY (`projectrevlog`) REFERENCES `projectrevlog` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table to Add Documents Related to Project Logs';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `projectrevlogdoc`
---
-
-LOCK TABLES `projectrevlogdoc` WRITE;
-/*!40000 ALTER TABLE `projectrevlogdoc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projectrevlogdoc` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `projectrevmilestone`
---
-
-DROP TABLE IF EXISTS `projectrevmilestone`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `projectrevmilestone` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `projectrev` varchar(255) COLLATE utf8_bin NOT NULL,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `start` date NOT NULL,
-  `end` date NOT NULL,
-  `perc` decimal(10,0) DEFAULT '0',
+  `gid` varchar(255) COLLATE utf8_bin NOT NULL,
+  `submitedin` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `projectrevmilestones_projectrev_fk` (`projectrev`),
-  KEY `projectrevmilestones_createdby_fk` (`createdby`),
-  CONSTRAINT `projectrevmilestones_createdby_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `projectrevmilestones_projectrev_fk` FOREIGN KEY (`projectrev`) REFERENCES `projectrev` (`id`)
+  UNIQUE KEY `projtobe_gid_uindex` (`gid`),
+  CONSTRAINT `projtobe_group_fk` FOREIGN KEY (`gid`) REFERENCES `group` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `projectrevmilestone`
+-- Dumping data for table `projtobe`
 --
 
-LOCK TABLES `projectrevmilestone` WRITE;
-/*!40000 ALTER TABLE `projectrevmilestone` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projectrevmilestone` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `projectweb`
---
-
-DROP TABLE IF EXISTS `projectweb`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `projectweb` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `createdby` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `projectweb_entity_fk` (`createdby`),
-  CONSTRAINT `projectweb_entity_fk` FOREIGN KEY (`createdby`) REFERENCES `entity` (`id`),
-  CONSTRAINT `projectweb_project_fk` FOREIGN KEY (`id`) REFERENCES `project` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table Used to Define Which Projects Show on Public Page';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `projectweb`
---
-
-LOCK TABLES `projectweb` WRITE;
-/*!40000 ALTER TABLE `projectweb` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projectweb` ENABLE KEYS */;
+LOCK TABLES `projtobe` WRITE;
+/*!40000 ALTER TABLE `projtobe` DISABLE KEYS */;
+/*!40000 ALTER TABLE `projtobe` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -609,7 +246,7 @@ DROP TABLE IF EXISTS `school`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `school` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `desc` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -624,54 +261,26 @@ LOCK TABLES `school` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `student`
+-- Table structure for table `type`
 --
 
-DROP TABLE IF EXISTS `student`;
+DROP TABLE IF EXISTS `type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `student` (
+CREATE TABLE `type` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `studentid` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `student_studentid_uindex` (`studentid`),
-  CONSTRAINT `student_id_fk` FOREIGN KEY (`id`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  `desc` varchar(255) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Types Table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `student`
+-- Dumping data for table `type`
 --
 
-LOCK TABLES `student` WRITE;
-/*!40000 ALTER TABLE `student` DISABLE KEYS */;
-INSERT INTO `student` VALUES ('26774d25-1857-11e7-a99b-525400f5614a','123456');
-/*!40000 ALTER TABLE `student` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `teacher`
---
-
-DROP TABLE IF EXISTS `teacher`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `teacher` (
-  `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `teacherid` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `teacher_teacherid_uindex` (`teacherid`),
-  CONSTRAINT `teacher_fk` FOREIGN KEY (`id`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `teacher`
---
-
-LOCK TABLES `teacher` WRITE;
-/*!40000 ALTER TABLE `teacher` DISABLE KEYS */;
-/*!40000 ALTER TABLE `teacher` ENABLE KEYS */;
+LOCK TABLES `type` WRITE;
+/*!40000 ALTER TABLE `type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `type` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -683,17 +292,23 @@ DROP TABLE IF EXISTS `user`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
-  `username` varchar(255) COLLATE utf8_bin NOT NULL,
+  `name` varchar(255) COLLATE utf8_bin NOT NULL,
+  `photo` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT 'default_photo.png',
+  `external_id` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `type` varchar(255) COLLATE utf8_bin NOT NULL,
+  `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `phonenumber` varchar(14) COLLATE utf8_bin DEFAULT NULL,
+  `isadmin` tinyint(1) NOT NULL DEFAULT '0',
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
-  `email` varchar(255) COLLATE utf8_bin NOT NULL,
-  `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `username` varchar(255) COLLATE utf8_bin NOT NULL,
   `locked` tinyint(1) DEFAULT '0',
   `active` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `users_username_uindex` (`username`),
-  UNIQUE KEY `users_email_uindex` (`email`),
-  CONSTRAINT `users_entity_fk` FOREIGN KEY (`id`) REFERENCES `entity` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  UNIQUE KEY `user_username_uindex` (`username`),
+  UNIQUE KEY `users_external_id_uindex` (`external_id`),
+  KEY `user_type_fk` (`type`),
+  CONSTRAINT `user_type_fk` FOREIGN KEY (`type`) REFERENCES `type` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users Table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -702,12 +317,26 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES ('26774d25-1857-11e7-a99b-525400f5614a','username','a','email','2017-04-15 20:30:11',0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Dumping routines for database 'projectary'
+-- Temporary table structure for view `vw_projectattributes`
+--
+
+DROP TABLE IF EXISTS `vw_projectattributes`;
+/*!50001 DROP VIEW IF EXISTS `vw_projectattributes`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE TABLE `vw_projectattributes` (
+  `pid` tinyint NOT NULL,
+  `desc` tinyint NOT NULL,
+  `value` tinyint NOT NULL
+) ENGINE=MyISAM */;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping routines for database 'projectary-master'
 --
 /*!50003 DROP PROCEDURE IF EXISTS `API_InsertNewAdmin` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -1130,7 +759,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `DEPRACATED_InsertNewProjectRevisionEntity` */;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertNewUser` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -1140,47 +769,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DEPRACATED_InsertNewProjectRevisionEntity`(IN `projectrev` VARCHAR(255),IN `projentity` VARCHAR(255),IN `function` VARCHAR(255),IN `entity` VARCHAR(255))
-BEGIN
-    DECLARE UUID VARCHAR(255);
-    SELECT UUID() INTO UUID;
-    INSERT INTO projectreventity VALUES (projectrev,projentity,function,NOW(),entity);
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `DEPRACATED_InsertNewSchoolEntity` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DEPRACATED_InsertNewSchoolEntity`(IN `school` VARCHAR(255),IN `entity` VARCHAR(255))
-BEGIN
-    INSERT INTO schoolentity VALUES (school,entity);
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `InsertNewEntity` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertNewEntity`(IN name VARCHAR(255), IN type INT, IN extid VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertNewUser`(IN name VARCHAR(255), IN type INT, IN extid VARCHAR(255))
 BEGIN
  DECLARE UUID VARCHAR(255);
 CASE
@@ -1193,6 +782,31 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Current Database: `projectary-master`
+--
+
+USE `projectary-master`;
+
+--
+-- Final view structure for view `vw_projectattributes`
+--
+
+/*!50001 DROP TABLE IF EXISTS `vw_projectattributes`*/;
+/*!50001 DROP VIEW IF EXISTS `vw_projectattributes`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vw_projectattributes` AS select `p`.`id` AS `pid`,`a`.`desc` AS `desc`,`pa`.`value` AS `value` from ((`project` `p` join `projectattribute` `pa`) join `attribute` `a`) where ((`p`.`id` = `pa`.`pid`) and (`pa`.`aid` = `a`.`id`)) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -1203,4 +817,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-04-05 11:51:29
+-- Dump completed on 2017-04-10 12:12:20

@@ -1,2 +1,3 @@
 #BAckup Base de Dados
-mysqldump -u $1 -p --routines --databases projectary --result-file="projectary-bd-dump.sql"
+DATABASENAME="projectary-master"
+mysqldump -u $1 -p --routines --databases $DATABASENAME --result-file="projectary-bd-dump.sql"
