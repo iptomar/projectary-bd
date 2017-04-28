@@ -1,35 +1,29 @@
--- isAdmin --
-DROP PROCEDURE IF EXISTS isAdmin;
-DELIMITER $$
-CREATE PROCEDURE isAdmin(IN id INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `JON_ApprovedProject`(IN PID int)
 BEGIN
-	SELECT u.isadmin FROM user u WHERE u.id = id;
-END$$
-DELIMITER ;
+Set @currentdate = CURDATE();
+Set @approvedin = (Select approvedin from project where project.id = PID);
+IF (@approvedin IS NULL) THEN 
+	RETURN 0;
+ELSEIF (CAST(currentdate as DATE) >= CAST(approvedin as DATE)) THEN 
+	RETURN 1;
+ELSE 
+	RETURN 0;
+END IF;
+END
 
--- isteacher --
-DROP PROCEDURE IF EXISTS isTeacher;
-DELIMITER $$
-CREATE PROCEDURE isTeacher(IN id INT)
+CREATE PROCEDURE `JON_InsertNewAdmin` (IN ID INT)
 BEGIN
-	SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "teacher");
-END$$
-DELIMITER ;
+Set @typeid = (Select id from type where type.desc = 'admin');
+Update user set typeid = @typeid where id = ID;
+END
 
--- isStudent --
-DROP PROCEDURE IF EXISTS isStudent;
-DELIMITER $$
-CREATE PROCEDURE isStudent(IN id INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `JON_RemoveUserGroup`(IN GID INT, IN ID INT)
 BEGIN
-	SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "student");
-END$$
-DELIMITER ;
+Delete from groupuser where groupuser.groupid = GID && groupuser.userid = ID;
+END
 
--- isInGroup --
-DROP PROCEDURE IF EXISTS isInGroup;
-DELIMITER $$
-CREATE PROCEDURE isInGroup(IN userid INT, IN groupid INT)
+CREATE PROCEDURE `JON_ListGroupUsers` (IN GID Int)
 BEGIN
-	SELECT EXISTS(SELECT * FROM groupuser gu WHERE gu.userid = userid AND gu.groupid = groupid);
-END$$
-DELIMITER ;
+Select id.a, username.a from users as a, groupuser as b, group as c where c.id = GID && b.groupid = c.id && a.id = b.userid;
+END
+
