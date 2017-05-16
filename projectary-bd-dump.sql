@@ -246,6 +246,7 @@ CREATE TABLE `school` (
 LOCK TABLES `school` WRITE;
 /*!40000 ALTER TABLE `school` DISABLE KEYS */;
 INSERT INTO `school` VALUES (1,'ESTT');
+INSERT INTO `school` VALUES (2,'ESTG');
 /*!40000 ALTER TABLE `school` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -304,7 +305,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Aluno testes','default_photo.png','1234',1,'1@ipt.pt','1234567789',0,'123qwe',0,0),(4,'Aluno testes','default_photo.png','12345',1,'2@ipt.pt','1234567789',0,'123qwe',0,0),(5,'Aluno testes','default_photo.png','123456',1,'3@ipt.pt','1234567789',0,'123qwe',0,0),(7,'Aluno testes','default_photo.png','12345678',1,'5@ipt.pt','1234567789',0,'123qwe',0,0);
+INSERT INTO `user` VALUES (1,'Aluno testes','default_photo.png','1234',1,'1@ipt.pt','1234567789',0,'46f94c8de14fb36680850768ff1b7f2a',0,1),(4,'Aluno testes','default_photo.png','12345',1,'2@ipt.pt','1234567789',0,'46f94c8de14fb36680850768ff1b7f2a',0,1),(5,'Aluno testes','default_photo.png','123456',1,'3@ipt.pt','1234567789',0,'46f94c8de14fb36680850768ff1b7f2a',0,1),(7,'Aluno testes','default_photo.png','12345678',1,'5@ipt.pt','1234567789',0,'46f94c8de14fb36680850768ff1b7f2a',0,1);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -848,7 +849,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `UpdateUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
 BEGIN
-    UPDATE userattribute set value=@value where userattribute.userid=@userid and userattribute.attributeid=@attributeid; 
+    UPDATE userattribute set value=@value where userattribute.userid=@userid and userattribute.attributeid=@attributeid;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -866,3 +867,203 @@ DELIMITER ;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2017-05-05 20:01:24
+
+/* Content from projectary-db-dump */
+DROP PROCEDURE IF EXISTS isAdmin;
+DELIMITER $$
+CREATE PROCEDURE isAdmin(IN id INT, OUT isAdmin BOOLEAN)
+BEGIN
+	SET isAdmin = (SELECT u.isadmin FROM user u WHERE u.id = id);
+END$$
+DELIMITER ;
+
+
+-- isteacher --
+DROP PROCEDURE IF EXISTS isTeacher;
+DELIMITER $$
+CREATE PROCEDURE isTeacher(IN id INT, OUT isTeacher BOOLEAN)
+BEGIN
+	SET isTeacher = (SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "teacher"));
+END$$
+DELIMITER ;
+
+
+-- isStudent --
+DROP PROCEDURE IF EXISTS isStudent;
+DELIMITER $$
+CREATE PROCEDURE isStudent(IN id INT, OUT isStudent BOOLEAN)
+BEGIN
+	SET isStudent = (SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "student"));
+END$$
+DELIMITER ;
+
+
+-- isInGroup --
+DROP PROCEDURE IF EXISTS isInGroup;
+DELIMITER $$
+CREATE PROCEDURE isInGroup(IN userid INT, IN groupid INT, OUT isInGroup BOOLEAN)
+BEGIN
+	SET isInGroup = (SELECT EXISTS(SELECT * FROM groupuser gu WHERE gu.userid = userid AND gu.groupid = groupid));
+END$$
+DELIMITER ;
+
+
+-- isInProject --
+DROP PROCEDURE IF EXISTS isInProject;
+DELIMITER $$
+CREATE PROCEDURE isInProject(IN userid INT, OUT isInProject BOOLEAN)
+BEGIN
+	SET isInProject = (SELECT EXISTS(SELECT * FROM groupuser gu, application a WHERE gu.userid = userid AND gu.groupid = a.groupid AND YEAR(a.approvedin) != 0000));
+END$$
+DELIMITER ;
+
+
+-- addToGroup --
+DROP PROCEDURE IF EXISTS addToGroup;
+DELIMITER $$
+CREATE PROCEDURE addToGroup(IN userid INT, IN groupid INT, IN password VARCHAR(255), OUT state BOOLEAN)
+BEGIN
+	SET state = FALSE;
+	CALL isInProject(userid, @project);
+	IF (@project = FALSE) THEN
+		CALL isInGroup(userid, groupid, @isInGroup);
+        IF (@isInGroup = FALSE) THEN
+			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid AND g.password = password)) THEN
+				INSERT INTO groupuser(groupid, userid)
+					VALUES (groupid, userid);
+                    SET state = TRUE;
+			END IF;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+
+-- insertNewGroup --
+DROP PROCEDURE IF EXISTS insertNewGroup;
+DELIMITER $$
+CREATE PROCEDURE insertNewGroup(IN userid INT, IN description VARCHAR(255), IN password VARCHAR(255), OUT groupid INT)
+BEGIN
+	CALL isInProject(userid, @project);
+	IF (@project=FALSE) THEN
+		INSERT INTO `group`(`desc`, password)
+			VALUES (description, password);
+		SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = password);
+		INSERT INTO groupuser (groupid, userid)
+			VALUES (groupid, userid);
+	END IF;
+END$$
+DELIMITER ;
+
+-- insertNewApplication --
+DROP PROCEDURE IF EXISTS insertNewApplication;
+DELIMITER $$
+CREATE PROCEDURE insertNewApplication(IN userid INT, IN groupid INT, IN projectid INT, OUT state BOOLEAN)
+BEGIN
+	SET state = FALSE;
+	CALL isStudent(userid, @student);
+	IF (@student = TRUE) THEN
+		CALL isInGroup(userid, groupid, @isInGroup);
+        IF (@isInGroup = TRUE) THEN
+			CALL isInProject(userid, @project);
+			IF (@project = FALSE) THEN
+				IF (SELECT EXISTS(SELECT * FROM project p WHERE p.id = projectid AND p.approvedin IS NOT NULL)) THEN
+					INSERT INTO application(groupid, projectid, submitedin)
+						VALUES (groupid, projectid, NOW());
+						SET state = TRUE;
+				END IF;
+			END IF;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- listCouses --
+DROP PROCEDURE IF EXISTS listCouses;
+DELIMITER $$
+CREATE PROCEDURE listCouses (IN schoolid INT)
+BEGIN
+	SELECT c.`desc` as 'course' FROM course c WHERE c.schoolid = schoolid;
+END$$
+DELIMITER ;
+
+-- listSchools --
+DROP PROCEDURE IF EXISTS listSchools;
+DELIMITER $$
+CREATE PROCEDURE listSchools ()
+BEGIN
+	SELECT s.`desc` as 'school' FROM school s;
+END$$
+DELIMITER ;
+
+-- listApplications --
+DROP PROCEDURE IF EXISTS listApplications;
+DELIMITER $$
+CREATE PROCEDURE listApplications (IN projectid INT, IN approved INT)
+BEGIN
+	CASE
+		WHEN approved = 0 THEN
+			IF (projectid > 0) THEN
+				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) = 0000;
+			ELSE
+				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) = 0000;
+			END IF;
+		WHEN approved = 1 THEN
+			IF (projectid > 0) THEN
+				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) != 0000;
+			ELSE
+				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) != 0000;
+			END IF;
+	END CASE;
+END$$
+DELIMITER ;
+
+-- insertNewCourse --
+DROP PROCEDURE IF EXISTS insertNewCourse;
+DELIMITER $$
+CREATE PROCEDURE insertNewCourse (IN schoolid INT, IN description VARCHAR(255))
+BEGIN
+	INSERT INTO course (schoolid, `desc`)
+		VALUES (schoolid, description);
+END$$
+DELIMITER ;
+
+-- insertNewType --
+DROP PROCEDURE IF EXISTS insertNewType;
+DELIMITER $$
+CREATE PROCEDURE insertNewType (IN description VARCHAR(255))
+BEGIN
+	INSERT INTO type (`desc`)
+		VALUES (description);
+END$$
+DELIMITER ;
+
+-- insertNewProject --
+DROP PROCEDURE IF EXISTS insertNewProject;
+DELIMITER $$
+CREATE PROCEDURE insertNewProject (IN schoolyear YEAR, IN courseid INT, IN name VARCHAR(255), IN description VARCHAR(255), IN userid INT)
+BEGIN
+	CALL isTeacher (userid, @teacher);
+    IF (@teacher = 1) THEN
+		INSERT INTO project (approvedin, year, courseid, name, description, userid, created)
+			VALUES (NOW(), schoolyear, courseid, name, description, userid, NOW());
+	ELSE
+		INSERT INTO project (year, courseid, name, description, userid, created)
+			VALUES (schoolyear, courseid, name, description, userid, NOW());
+	END IF;
+END$$
+DELIMITER ;
+
+-- listProjects --
+DROP PROCEDURE IF EXISTS listProjects;
+DELIMITER $$
+CREATE PROCEDURE listProjects (IN courseid INT, IN schoolyear YEAR, IN approved INT)
+BEGIN
+	CASE
+		WHEN approved = 0 THEN
+				SELECT * FROM project p WHERE p.courseid = courseid AND p.year = schoolyear AND YEAR(p.approvedin) IS NULL;
+		WHEN approved = 1 THEN
+				SELECT * FROM project p WHERE p.courseid = courseid AND p.year = schoolyear AND YEAR(p.approvedin) IS NOT NULL;
+	END CASE;
+END$$
+DELIMITER ;
