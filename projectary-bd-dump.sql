@@ -398,7 +398,7 @@ BEGIN
 		IF (@project = FALSE) THEN
 			CALL isInGroup(userid, @groupid, @isInGroup);
 			IF (@isInGroup = FALSE) THEN
-				IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = @groupid AND g.password = password)) THEN
+				IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = @groupid AND g.password = MD5(password))) THEN
 					INSERT INTO groupuser(groupid, userid)
 						VALUES (@groupid, userid);
 						SET state = @groupid;
@@ -498,7 +498,7 @@ BEGIN
 		CALL descExists(description, @descExists);
         IF (@descExists = FALSE) THEN
 			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
-				UPDATE `group` SET `desc` = description, `password` = pass
+				UPDATE `group` SET `desc` = description, `password` = MD5(pass)
 					WHERE `group`.id = groupid;
 				SET state = TRUE;
 			END IF;
@@ -672,8 +672,8 @@ BEGIN
    		CALL descExists(description, @descExists);
         IF (@descExists = FALSE) THEN
 			INSERT INTO `group`(`desc`, password)
-				VALUES (description, password);
-			SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = password);
+				VALUES (description, MD5(password));
+			SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = MD5(password));
 			INSERT INTO groupuser (groupid, userid, `owner`)
 				VALUES (groupid, userid, 1);
 		END IF;
@@ -1068,4 +1068,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-08  0:17:09
+-- Dump completed on 2017-06-08 15:42:14
