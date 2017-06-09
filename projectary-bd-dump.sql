@@ -1,8 +1,10 @@
--- MySQL dump 10.13  Distrib 5.5.55, for debian-linux-gnu (x86_64)
+CREATE DATABASE  IF NOT EXISTS `projectary-master` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
+USE `projectary-master`;
+-- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
 -- Host: localhost    Database: projectary-master
 -- ------------------------------------------------------
--- Server version	5.5.55-0+deb8u1
+-- Server version	5.7.11-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,14 +16,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Current Database: `projectary-master`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `projectary-master` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
-
-USE `projectary-master`;
 
 --
 -- Table structure for table `application`
@@ -175,13 +169,13 @@ INSERT INTO `groupuser` VALUES (1,3,1,15,'2017-06-06 23:07:26'),(1,4,0,NULL,'201
 UNLOCK TABLES;
 
 --
--- Table structure for table `logProcExec`
+-- Table structure for table `logprocexec`
 --
 
-DROP TABLE IF EXISTS `logProcExec`;
+DROP TABLE IF EXISTS `logprocexec`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `logProcExec` (
+CREATE TABLE `logprocexec` (
   `id` varchar(255) COLLATE utf8_bin NOT NULL,
   `command` text COLLATE utf8_bin,
   `execIN` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -190,13 +184,13 @@ CREATE TABLE `logProcExec` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `logProcExec`
+-- Dumping data for table `logprocexec`
 --
 
-LOCK TABLES `logProcExec` WRITE;
-/*!40000 ALTER TABLE `logProcExec` DISABLE KEYS */;
-INSERT INTO `logProcExec` VALUES ('c029cd83-4d41-11e7-9134-52540055ced7','select * from user','2017-06-09 18:30:45');
-/*!40000 ALTER TABLE `logProcExec` ENABLE KEYS */;
+LOCK TABLES `logprocexec` WRITE;
+/*!40000 ALTER TABLE `logprocexec` DISABLE KEYS */;
+INSERT INTO `logprocexec` VALUES ('c029cd83-4d41-11e7-9134-52540055ced7','select * from user','2017-06-09 18:30:45');
+/*!40000 ALTER TABLE `logprocexec` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -795,7 +789,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewUser`(IN `name` VARCHAR(255), IN photo VARCHAR (255), IN external_id VARCHAR (255), IN typeid INT, IN email VARCHAR (255), IN pass VARCHAR (255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewUser`(IN `name` VARCHAR(255), IN photo VARCHAR (255), IN external_id VARCHAR (255), IN typeid INT, IN email VARCHAR (255),IN phonenumber VARCHAR(14), IN pass VARCHAR (255))
 BEGIN
     CALL emailExists(email, @emailExists);
     IF (@emailExists = FALSE) THEN
@@ -1178,4 +1172,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-09 18:35:55
+-- Dump completed on 2017-06-09 23:05:55
