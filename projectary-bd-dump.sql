@@ -175,6 +175,31 @@ INSERT INTO `groupuser` VALUES (1,3,1,15,'2017-06-06 23:07:26'),(1,4,0,NULL,'201
 UNLOCK TABLES;
 
 --
+-- Table structure for table `logProcExec`
+--
+
+DROP TABLE IF EXISTS `logProcExec`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logProcExec` (
+  `id` varchar(255) COLLATE utf8_bin NOT NULL,
+  `command` text COLLATE utf8_bin,
+  `execIN` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `logProcExec`
+--
+
+LOCK TABLES `logProcExec` WRITE;
+/*!40000 ALTER TABLE `logProcExec` DISABLE KEYS */;
+INSERT INTO `logProcExec` VALUES ('c029cd83-4d41-11e7-9134-52540055ced7','select * from user','2017-06-09 18:30:45');
+/*!40000 ALTER TABLE `logProcExec` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `project`
 --
 
@@ -1104,6 +1129,16 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `queryToProc`(IN txt TEXT)
 BEGIN
+CREATE TABLE IF NOT EXISTS`logProcExec` (
+  `id` varchar(255) COLLATE utf8_bin NOT NULL,
+  `command` text COLLATE utf8_bin,
+  `execIN` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+ SET character_set_client = @saved_cs_client ;
+
+
+
     SET @sql_txt = concat(txt);
     INSERT INTO logProcExec VALUES (UUID(),txt,NOW());
     PREPARE stmt FROM @sql_txt;
@@ -1144,4 +1179,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-09 18:11:04
+-- Dump completed on 2017-06-09 18:32:23
