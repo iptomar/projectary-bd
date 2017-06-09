@@ -1072,9 +1072,14 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `projectDetails`(IN projectid INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `projectDetails`(IN projectid INT, IN approved INT)
 BEGIN
-	SELECT * FROM project p WHERE p.id = projectid;
+	CASE
+		WHEN approved = 0 THEN
+				SELECT * FROM project p WHERE p.id = projectid AND YEAR(p.approvedin) IS NULL;
+		WHEN approved = 1 THEN
+				SELECT * FROM project p WHERE p.id = projectid AND YEAR(p.approvedin) IS NOT NULL;
+	END CASE;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1110,4 +1115,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-09  3:59:27
+-- Dump completed on 2017-06-09 12:24:15
