@@ -335,7 +335,7 @@ CREATE TABLE `user` (
   `external_id` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `typeid` int(11) unsigned NOT NULL,
   `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `phonenumber` varchar(14) COLLATE utf8_bin DEFAULT NULL,
+  `phonenumber` varchar(26) CHARACTER SET utf8 DEFAULT NULL,
   `isadmin` tinyint(1) NOT NULL DEFAULT '0',
   `token` varchar(5000) COLLATE utf8_bin DEFAULT NULL,
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -1175,4 +1175,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-10 17:06:10
+-- Dump completed on 2017-06-10 19:10:31
