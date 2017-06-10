@@ -331,7 +331,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_bin NOT NULL,
-  `photo` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT 'default_photo.png',
+  `photo` varchar(255) CHARACTER SET utf8 DEFAULT 'default_photo.png',
   `external_id` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `typeid` int(11) unsigned NOT NULL,
   `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -344,7 +344,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_external_id_uindex` (`external_id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users Table';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users Table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -796,11 +796,11 @@ BEGIN
     IF (@emailExists = FALSE) THEN
 		CALL externalExists(external_id, @externalExists);
 		IF (@externalExists = FALSE) THEN
-			IF (photo = NULL) THEN
+			IF (photo IS NULL) THEN
 				SET photo = "default_photo.png";
-				INSERT INTO `user`(`name`, photo, external_id, typeid, email, phonenumber, isadmin, `password`, locked, active)
-				VALUES (`name`, photo, external_id, typeid, email, phonenumber, 0, MD5(pass), 0, 0);
 			END IF;
+			INSERT INTO `user`(`name`, photo, external_id, typeid, email, phonenumber, isadmin, `password`, locked, active)
+			VALUES (`name`, photo, external_id, typeid, email, phonenumber, 0, MD5(pass), 0, 0);
 		END IF;
 	END IF;
 END ;;
@@ -1175,4 +1175,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-09 23:48:20
+-- Dump completed on 2017-06-10 17:06:10
