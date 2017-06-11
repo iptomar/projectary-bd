@@ -138,7 +138,7 @@ CREATE TABLE `group` (
 
 LOCK TABLES `group` WRITE;
 /*!40000 ALTER TABLE `group` DISABLE KEYS */;
-INSERT INTO `group` VALUES (1,'chouriças','1234'),(2,'pogamar','1234');
+INSERT INTO `group` VALUES (1,'chouriças','81dc9bdb52d04dc20036dbd8313ed055'),(2,'pogamar','81dc9bdb52d04dc20036dbd8313ed055');
 /*!40000 ALTER TABLE `group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1175,4 +1175,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-10 19:10:31
+-- Dump completed on 2017-06-11 21:49:03
