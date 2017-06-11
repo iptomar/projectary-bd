@@ -15,3 +15,8 @@ The database has 3 users by default.
  - **id** = 3, **student**, **email** = cebola@mole.ipt, **pass** = 123qwe, **active**
  - **id** = 4, **student**, **email** = maria@leal.ipt, **pass** = 123qwe, **active**
  - **id** = 5, **student**, **email** = quim@barreiros.ipt, **pass** = 123qwe, **active**
+
+The database has 2 groups by default.
+
+ - **id** = 1, **chouriças**, **pass** = 1234
+ - **id** = 2, **pogamar**, **pass** = 1234
