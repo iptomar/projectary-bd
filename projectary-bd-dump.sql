@@ -426,7 +426,7 @@ BEGIN
 		IF (@project = FALSE) THEN
 			CALL isInGroup(userid, @groupid, @isInGroup);
 			IF (@isInGroup = FALSE) THEN
-				IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = @groupid AND g.password = MD5(password))) THEN
+				IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = @groupid AND g.password = password)) THEN
 					INSERT INTO groupuser(groupid, userid)
 						VALUES (@groupid, userid);
 						SET state = @groupid;
@@ -526,7 +526,7 @@ BEGIN
 		CALL descExists(description, @descExists);
         IF (@descExists = FALSE) THEN
 			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
-				UPDATE `group` SET `desc` = description, `password` = MD5(pass)
+				UPDATE `group` SET `desc` = description, `password` = pass
 					WHERE `group`.id = groupid;
 				SET state = TRUE;
 			END IF;
@@ -722,8 +722,8 @@ BEGIN
    		CALL descExists(description, @descExists);
         IF (@descExists = FALSE) THEN
 			INSERT INTO `group`(`desc`, password)
-				VALUES (description, MD5(password));
-			SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = MD5(password));
+				VALUES (description, password);
+			SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = password);
 			INSERT INTO groupuser (groupid, userid, `owner`)
 				VALUES (groupid, userid, 1);
 		END IF;
@@ -800,7 +800,7 @@ BEGIN
 				SET photo = "default_photo.png";
 			END IF;
 			INSERT INTO `user`(`name`, photo, external_id, typeid, email, phonenumber, isadmin, `password`, locked, active)
-			VALUES (`name`, photo, external_id, typeid, email, phonenumber, 0, MD5(pass), 0, 0);
+			VALUES (`name`, photo, external_id, typeid, email, phonenumber, 0, pass, 0, 0);
 		END IF;
 	END IF;
 END ;;
@@ -1175,4 +1175,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-11 21:49:03
+-- Dump completed on 2017-06-12 15:37:43
